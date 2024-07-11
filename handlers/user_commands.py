@@ -11,7 +11,7 @@ import os
 dotenv_path = os.path.join("data", '.env')
 load_dotenv(dotenv_path=dotenv_path)
 
-admin_uids = os.getenv("ADMIN_UIDS")replace(" ", "").split(", "). #list
+admin_uids = os.getenv("ADMIN_UIDS").replace(" ", "").split(", ")#list
 user: Router = Router()
 
 async def start_message(uid, msg):
