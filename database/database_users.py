@@ -27,3 +27,5 @@ class Users:
         self.db.commit()
         await msg.message.answer(f"""База данных очищена!""")
         
+Users().create_db()
+        
