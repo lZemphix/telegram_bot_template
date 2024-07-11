@@ -11,7 +11,7 @@ import asyncio, os
 dotenv_path = os.path.join("data", '.env')
 load_dotenv(dotenv_path=dotenv_path)
 
-admin_uids = os.getenv("ADMIN_UID") #list
+admin_uids = os.getenv("ADMIN_UIDS").split(", ").replace(" ", "") #list
 admin: Router = Router()
 
 @admin.callback_query(F.data == "admin")

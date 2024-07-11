@@ -1,7 +1,7 @@
 from aiogram import Router, F, Bot
 from aiogram.filters import Command, StateFilter
 from aiogram.types import Message, CallbackQuery
-from database.database import Users
+from database.database_users import Users
 from keyboards.inline import Kb_maker
 # from aiogram.fsm.context import FSMContext
 # from utils.states import ?
@@ -11,23 +11,23 @@ import os
 dotenv_path = os.path.join("data", '.env')
 load_dotenv(dotenv_path=dotenv_path)
 
-admin_uids = os.getenv("ADMIN_UID") #list
+admin_uids = os.getenv("ADMIN_UIDS").split(", ").replace(" ", "") #list
 user: Router = Router()
 
-@user.message(Command("start"))
-async def start_message(msg: Message):
+async def start_message(uid, msg):
     Users().create_db()
-    user_exists = Users.cursor.execute(f"SELECT * FROM users WHERE uid = {msg.from_user.id}").fetchone()
-    if user_exists:
-        pass
+    if str(uid) in admin_uids:
+        await msg.answer(f"""Привет, {msg.from_user.first_name}!""", reply_markup=Kb_maker().callback_buttons(titles=['кнопка'], callbacks=['button'], rows=2))
     else:
-        Users.cursor.execute(f"INSERT INTO users (uid, username) VALUES ({msg.from_user.id}, '{msg.from_user.username}')")
-    Users().save()
-    
-    buttons, callbacks = ['Кнопка'],['button']
-    
-    if msg.from_user.id in admin_uids:
-        buttons.append('⚙ Админ панель')
-        callbacks.append('admin')
-    
-    await msg.answer(f"""Привет, {msg.from_user.first_name}!""", reply_markup=Kb_maker().callback_buttons(titles=buttons, callbacks=callbacks, rows=2))
+        await msg.answer(f"""Привет, {msg.from_user.first_name}!""", reply_markup=Kb_maker().callback_buttons(titles=['кнопка', '⚙ Админ панель'], callbacks=['button', 'admin'], rows=2))
+
+
+@user.message(Command("start"))
+async def start_command(msg: Message):
+    await Users().check_user(msg)
+    await start_message(msg.from_user.id, msg)
+
+@user.callback_query(F.data == "main")
+async def main_menu(clb: CallbackQuery):
+    await Users().check_user(clb)
+    await start_message(clb.from_user.id, clb.message)
