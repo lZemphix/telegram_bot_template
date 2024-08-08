@@ -12,10 +12,10 @@ class banMiddleware(BaseMiddleware):
         if user is None:
             pass
     
-        if "event" is None:
+        if "event" == None:
             pass
         else:
-            if "event" is True:
+            if "event" == True:
                 return
             else:
                 pass

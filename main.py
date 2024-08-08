@@ -5,8 +5,7 @@ from aiogram import Bot, Dispatcher
 from handlers import user_commands, admin_commands
 from utils import middlewares
 
-dotenv_path = os.path.join("data", '.env')
-load_dotenv(dotenv_path=dotenv_path)
+load_dotenv()
 
 TOKEN = os.getenv("BOT_TOKEN")
 
