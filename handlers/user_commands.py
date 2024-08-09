@@ -1,31 +1,34 @@
 from aiogram import Router, F, Bot
 from aiogram.filters import Command, StateFilter
-from aiogram.utils.keyboard import InlineKeyboardBuilder
-from aiogram.types import Message, CallbackQuery
-from keyboards.inline import KeyboardBuilder
+from aiogram.types import Message, CallbackQuery, User
+from keyboards.keyboard import KeyboardBuilder
 # from aiogram.fsm.context import FSMContext
 # from utils.states import ?
+from database.actions import add_user, check_user
 from dotenv import load_dotenv
-import os
+import os, logging
 
 load_dotenv()
+logging.basicConfig(level=logging.DEBUG, filename="logs/user_commands.log", format="%(asctime)s - %(levelname)s - %(message)s")
 
 admin_uids: list[int] = os.getenv("ADMIN_UIDS").replace(" ", "").split(",") #list
 user = Router()
 
 
-async def start_message(uid, msg):
-    # Users().create_db()
+async def start_message(uid, msg, username):
+    try:
+       (await check_user(uid))[0]
+    except:
+        await add_user(username, uid)
     if uid in admin_uids:
-        await msg.answer(f"""Привет, {msg.from_user.first_name}! """)
+        await msg.answer(f"""Привет, {username}! """)
     else:
-        
-        await msg.answer(f"""Привет, {msg.from_user.first_name}!""", reply_markup=KeyboardBuilder().callback_buttons(rows=1, **{"Админ панель": "admin"}))
+        await msg.answer(f"""Привет, {username}!""", reply_markup=KeyboardBuilder().callback_buttons(rows=1, admin="Админ панель"))
 
 @user.message(Command("start"))
 async def start_command(msg: Message):
-    await start_message(msg.from_user.id, msg)
+    await start_message(msg.from_user.id, msg, msg.from_user.username)
 
 @user.callback_query(F.data == "main")
 async def main_menu(clb: CallbackQuery):
-    await start_message(clb.from_user.id, clb.message)
+    await start_message(clb.from_user.id, clb.message, clb.from_user.username)
