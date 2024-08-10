@@ -4,7 +4,7 @@ from aiogram.types import Message, CallbackQuery, User
 from keyboards.keyboard import KeyboardBuilder
 # from aiogram.fsm.context import FSMContext
 # from utils.states import ?
-from database.actions import add_user, check_user
+from database.actions import users_actions, table_actions
 from dotenv import load_dotenv
 import os, logging
 
@@ -17,9 +17,9 @@ user = Router()
 
 async def start_message(uid, msg, username):
     try:
-       (await check_user(uid))[0]
+       (await users_actions.check_user(uid))[0]
     except:
-        await add_user(username, uid)
+        await users_actions.add_user(username, uid)
     if uid in admin_uids:
         await msg.answer(f"""Привет, {username}! """)
     else:

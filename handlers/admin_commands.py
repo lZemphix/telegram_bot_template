@@ -1,7 +1,7 @@
 from aiogram import Router, F, Bot 
 # from aiogram.filters import StateFilter
 from aiogram.types import Message, CallbackQuery
-from database.actions import *
+from database.actions import table_actions, users_actions
 # from aiogram.fsm.context import FSMContext
 # from utils.states import *
 from dotenv import load_dotenv
@@ -22,7 +22,7 @@ async def admin_panel(clb: CallbackQuery):
     
 @admin.callback_query(F.data == "recreate_tables")
 async def create_tables_command(clb: CallbackQuery):
-    await drop_tables()
-    await create_tables()
+    await table_actions.drop_tables()
+    await table_actions.create_tables()
     await clb.message.answer(f"""Таблицы были созданы""", reply_markup=KeyboardBuilder().callback_buttons(admin="Админ панель"))
 
