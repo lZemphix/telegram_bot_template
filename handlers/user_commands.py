@@ -1,19 +1,19 @@
-from aiogram import Router, F, Bot
-from aiogram.filters import Command, StateFilter
-from aiogram.types import Message, CallbackQuery, User
+from aiogram import Router, F
+from aiogram.filters import Command
+from aiogram.types import Message, CallbackQuery
 from keyboards.keyboard import KeyboardBuilder
+from database.actions import users_actions
+from dotenv import load_dotenv
+import os
+import logging
 # from aiogram.fsm.context import FSMContext
 # from utils.states import ?
-from database.actions import users_actions, table_actions
-from dotenv import load_dotenv
-import os, logging
 
 load_dotenv()
 logging.basicConfig(level=logging.DEBUG, filename="logs/user_commands.log", format="%(asctime)s - %(levelname)s - %(message)s")
 
 admin_uids: list[int] = os.getenv("ADMIN_UIDS").replace(" ", "").split(",") #list
 user = Router()
-
 
 async def start_message(uid, msg, username):
     try:
